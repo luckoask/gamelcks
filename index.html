@@ -179,60 +179,69 @@
     </div>
     
     <script>
-        // Function to initialize the page
-        function initializePage() {
-            // Load likes from localStorage
-            var likes = localStorage.getItem('likes');
-            if (likes) {
-                // Update like counter
-                likeCounter.textContent = likes + ' likes';
-                // Check if the video was previously liked
-                if (localStorage.getItem('liked') === 'true') {
-                    likeButton.classList.add('liked');
-                }
+        var chatMessages = document.getElementById('chat-messages');
+        var messageInput = document.getElementById('message-input');
+        var sendButton = document.getElementById('send-button');
+        var likeButton = document.getElementById('like-button');
+        var likeCounter = document.getElementById('like-counter');
+        var acceptCookiesButton = document.getElementById('accept-cookies');
+        var declineCookiesButton = document.getElementById('decline-cookies');
+
+        // Load chat messages from localStorage
+        window.onload = function() {
+            var storedMessages = JSON.parse(localStorage.getItem('chatMessages'));
+            if (storedMessages) {
+                storedMessages.forEach(function(message) {
+                    addMessage(message.text);
+                });
             }
-        }
+        };
 
-        // Initialize the page
-        initializePage();
-
-        // Add event listeners
         sendButton.addEventListener('click', function() {
-            // Send chat message
-            // ...
+            var messageText = messageInput.value;
+            if (messageText.trim() !== "") {
+                addMessage(messageText);
+                // Save message to localStorage
+                var storedMessages = JSON.parse(localStorage.getItem('chatMessages')) || [];
+                storedMessages.push({ text: messageText });
+                localStorage.setItem('chatMessages', JSON.stringify(storedMessages));
+                messageInput.value = ""; // Clear the input field after sending the messag
+            }
         });
 
         likeButton.addEventListener('click', function() {
-            // Toggle like button state
             var isLiked = likeButton.classList.toggle('liked');
-            var likes = parseInt(likeCounter.textContent);
-
-            // Update like counter
-            likeCounter.textContent = isLiked ? likes + 1 + ' likes' : likes - 1 + ' likes';
-
-            // Save like state and count to localStorage
-            localStorage.setItem('liked', isLiked);
-            localStorage.setItem('likes', isLiked ? likes + 1 : likes - 1);
+            var currentLikes = parseInt(likeCounter.textContent);
+            likeCounter.textContent = isLiked ? currentLikes + 1 + ' likes' : currentLikes - 1 + ' likes';
         });
 
         acceptCookiesButton.addEventListener('click', function() {
-            // Accept cookies
-            // ...
+            localStorage.setItem('cookiesAccepted', 'true');
+            document.getElementById('cookie-consent').style.display = 'none';
         });
 
         declineCookiesButton.addEventListener('click', function() {
-            // Decline cookies
-            // ...
+            localStorage.setItem('cookiesAccepted', 'false');
+            document.getElementById('cookie-consent').style.display = 'none';
         });
 
         function addMessage(text) {
-            // Add chat message
-            // ...
+            var messageDiv = document.createElement('div');
+            messageDiv.classList.add('comment');
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            // Scroll to bottom to show the latest message
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         function copyVideoLink() {
-            // Copy video link to clipboard
-            // ...
+            var textArea = document.createElement("textarea");
+            textArea.value = "https://cdn.discordapp.com/attachments/1204053877431869440/1239935467105947648/andrew_tate_emotional_speech_4.mp4.mov?ex=6644bb64&is=664369e4&hm=78a86feef9e8d7624db6f95a36f2eb88ffd0d0d98599102e75620567730bbe60";
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert("Video link copied to clipboard!");
         }
 
         // Check if cookies are accepted
