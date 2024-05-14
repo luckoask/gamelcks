@@ -11,21 +11,235 @@
             padding: 0;
             height: 100%;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
             background-color: black; 
+            color: white;
+        }
+        
+        #video-container {
+            width: 80%;
+            max-width: 800px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin: auto;
+            margin-top: 20px;
         }
         
         video {
             width: 100%;
-            height: 100%;
+            height: auto;
+        }
+        
+        #comment-section {
+            width: 30%;
+            padding: 20px;
+            box-sizing: border-box;
+            position: fixed;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+
+        #comment-input {
+            width: calc(100% - 20px);
+            margin-top: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .comment {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .action-button {
+            padding: 20px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .action-button img {
+            width: 60px;
+            height: 60px;
+        }
+
+        #like-counter {
+            font-size: 16px;
+        }
+
+        .liked img {
+            filter: brightness(2); /* Adjust brightness for "liked" state */
+        }
+
+        #cookie-consent {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        #cookie-consent button {
+            background-color: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        #cookie-consent button:hover {
+            background-color: white;
+            color: black;
+        }
+
+        #chat-section {
+            width: 30%;
+            padding: 20px;
+            box-sizing: border-box;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+
+        #chat-messages {
+            margin-top: 20px;
+        }
+
+        #message-input {
+            width: calc(100% - 20px);
+            margin-top: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        #send-button {
+            width: calc(100% - 20px);
+            margin-top: 10px;
+            padding: 10px;
+            background-color: transparent;
+            border: 1px solid white;
+            color: white;
+            cursor: pointer;
+        }
+
+        #send-button:hover {
+            background-color: white;
+            color: black;
         }
     </style>
 </head>
 <body>
-    <video controls autoplay>
-        <source src="https://cdn.discordapp.com/attachments/1138917873406984235/1228236912314159176/andrew_tate_emotional_speech_4.mp4.mp4?ex=66445c43&is=66430ac3&hm=55ea83d57ae762681a8b6234fe19020118608c305a9b5c168ea7c7c914fd1746" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
+    <div id="cookie-consent">
+        <p>This website uses cookies to ensure you get the best experience on our website.</p>
+        <button id="accept-cookies">Accept</button>
+        <button id="decline-cookies">Decline</button>
+    </div>
+
+    <div id="video-container">
+        <video controls autoplay>
+            <source src="https://cdn.discordapp.com/attachments/1204053877431869440/1239935467105947648/andrew_tate_emotional_speech_4.mp4.mov?ex=6644bb64&is=664369e4&hm=78a86feef9e8d7624db6f95a36f2eb88ffd0d0d98599102e75620567730bbe60" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="action-buttons">
+            <button class="action-button" id="like-button">
+                <img src="https://cdn.discordapp.com/attachments/1204053877431869440/1239933705070317640/image.png?ex=6644b9c0&is=66436840&hm=fd74d87c17d12e5add76feeb7368b809ab8c071edf7daaee92134e14978ee3bc" alt="Like">
+            </button>
+            <span id="like-counter">0 likes</span>
+            <button class="action-button" id="share-button" onclick="copyVideoLink()">
+                <img src="https://cdn.discordapp.com/attachments/1204053877431869440/1239933897245196438/image.png?ex=6644b9ed&is=6643686d&hm=3d80864f5ea4fdf6306616671cedbf62c983677db85fdd8ddd92d22d3cb8f890" alt="Share">
+            </button>
+        </div>
+    </div>
+
+    <div id="chat-section">
+        <h3 style="text-align: center;">Chat Room</h3>
+        <div id="chat-messages"></div>
+        <input type="text" id="message-input" placeholder="Type your message...">
+        <button id="send-button">Send</button>
+    </div>
+    
+    <script>
+        // Function to initialize the page
+        function initializePage() {
+            // Load likes from localStorage
+            var likes = localStorage.getItem('likes');
+            if (likes) {
+                // Update like counter
+                likeCounter.textContent = likes + ' likes';
+                // Check if the video was previously liked
+                if (localStorage.getItem('liked') === 'true') {
+                    likeButton.classList.add('liked');
+                }
+            }
+        }
+
+        // Initialize the page
+        initializePage();
+
+        // Add event listeners
+        sendButton.addEventListener('click', function() {
+            // Send chat message
+            // ...
+        });
+
+        likeButton.addEventListener('click', function() {
+            // Toggle like button state
+            var isLiked = likeButton.classList.toggle('liked');
+            var likes = parseInt(likeCounter.textContent);
+
+            // Update like counter
+            likeCounter.textContent = isLiked ? likes + 1 + ' likes' : likes - 1 + ' likes';
+
+            // Save like state and count to localStorage
+            localStorage.setItem('liked', isLiked);
+            localStorage.setItem('likes', isLiked ? likes + 1 : likes - 1);
+        });
+
+        acceptCookiesButton.addEventListener('click', function() {
+            // Accept cookies
+            // ...
+        });
+
+        declineCookiesButton.addEventListener('click', function() {
+            // Decline cookies
+            // ...
+        });
+
+        function addMessage(text) {
+            // Add chat message
+            // ...
+        }
+
+        function copyVideoLink() {
+            // Copy video link to clipboard
+            // ...
+        }
+
+        // Check if cookies are accepted
+        var cookiesAccepted = localStorage.getItem('cookiesAccepted');
+        if (cookiesAccepted === 'true') {
+            document.getElementById('cookie-consent').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
